@@ -69,7 +69,9 @@ xtractor$calc_features()
 #### Results
 ```{r, results='asis'}
 library(knitr)
-kable(head(xtractor$results))
+library(kableExtra)
+kable(head(xtractor$results)) %>%
+  kable_styling(position = "center")
 ```
 
 
