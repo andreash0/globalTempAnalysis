@@ -1,7 +1,6 @@
 ---
 title: "Analysis of the global temperature development"
 author: "Andreas Hofheinz"
-date: "February 19, 2019"
 output: html_document
 ---
 
@@ -39,10 +38,14 @@ df_glob_temp$year = year(df_glob_temp$dt)
 
 ### Create our user defined-functions
 ```{r, message=FALSE}
-fun = function(data) {
-  mean_sd = c(mean_temp = mean(data$LandAverageTemperature),
-    sd_temp = sd(data$LandAverageTemperature))
-  mean_sd
+land = function(data) {
+ c(mean_temp_land = mean(data$LandAverageTemperature),
+    sd_temp_land = sd(data$LandAverageTemperature))
+}
+
+land_ocean = function(data) {
+ c(mean_temp_land_ocean = mean(data$LandAndOceanAverageTemperature),
+    sd_temp_land_ocean = sd(data$LandAndOceanAverageTemperature))
 }
 ```
 
@@ -54,7 +57,8 @@ fun = function(data) {
 xtractor = Xtractor$new("xtractor")
 xtractor$n_cores = 2
 xtractor$add_data(df_glob_temp, group_by = "year")
-xtractor$add_feature(fun)
+xtractor$add_feature(land)
+xtractor$add_feature(land_ocean)
 ```
 
 #### Calculation
@@ -63,22 +67,28 @@ xtractor$calc_features()
 ```
 
 #### Results
-```{r}
-xtractor$results
+```{r, results='asis'}
+library(knitr)
+kable(head(xtractor$results))
 ```
 
 
 ```{r}
 df = xtractor$results
 df$year = as.numeric(df$year)
-g = ggplot(df, aes(x = year, y = mean_temp, group = 1)) + geom_point() + geom_smooth(method = "loess")
-g = g + scale_x_continuous(breaks = seq(1850, 2015, by = 20)) + ggtitle("Development of average global temperature") + 
+g = ggplot(df, aes(x = year, y = mean_temp_land)) + geom_point() + geom_smooth(method = "loess", color = "red")
+g = g + scale_x_continuous(breaks = seq(1850, 2015, by = 20)) + ggtitle("Development of average global temperature on land") + 
   labs(x = "Year", y = "Mean temperature [in °C]")
 g + theme_bw()
 ```
 
 
-
+```{r}
+g = ggplot(df, aes(x = year, y = mean_temp_land_ocean)) + geom_point() + geom_smooth(method = "loess", color = "red")
+g = g + scale_x_continuous(breaks = seq(1850, 2015, by = 20)) + ggtitle("Development of average global temperature for land and ocean") + 
+  labs(x = "Year", y = "Mean temperature [in °C]")
+g + theme_bw()
+```
 
 
 
