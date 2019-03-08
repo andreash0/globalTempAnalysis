@@ -104,5 +104,7 @@ g + theme_bw()
 ```
 
 
-
+```{r, echo = FALSE}
+unlink("fxtract_files", recursive = TRUE)
+```
 
